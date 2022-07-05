@@ -1,11 +1,13 @@
 variable "container_name" {
   type        = string
   description = "The name of the container. Up to 255 characters ([a-z], [A-Z], [0-9], -, _ allowed)"
+  default = "marketplace-app"
 }
 
 variable "container_image" {
   type        = string
   description = "The image used to start the container. Images in the Docker Hub registry available by default"
+  default = "${data.aws_ecr_repository.marketplace_app.repository_url}:${jsondecode(data.external.mp_app_tags_of_most_recently_pushed_image.result.tags)[0]}"
 }
 
 variable "container_memory" {
@@ -41,11 +43,11 @@ variable "port_mappings" {
 # https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_HealthCheck.html
 variable "healthcheck" {
   type = object({
-    command     = list(string)
-    retries     = number
-    timeout     = number
-    interval    = number
-    startPeriod = number
+    command     = ["CMD-SHELL", "test $(ls -l /var/www/public | wc -l) -ge 0 || exit 1"]
+    retries     = 3
+    timeout     = 5
+    interval    = 30
+    startPeriod = 3
   })
   description = "A map containing command (string), timeout, interval (duration in seconds), retries (1-10, number of times to retry before marking container unhealthy), and startPeriod (0-300, optional grace period to wait, in seconds, before failed healthchecks count toward retries)"
   default     = null
