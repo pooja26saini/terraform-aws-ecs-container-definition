@@ -1,15 +1,3 @@
-variable "container_name" {
-  type        = string
-  description = "The name of the container. Up to 255 characters ([a-z], [A-Z], [0-9], -, _ allowed)"
-  default = "marketplace-app"
-}
-
-variable "container_image" {
-  type        = string
-  description = "The image used to start the container. Images in the Docker Hub registry available by default"
-  default = "${data.aws_ecr_repository.marketplace_app.repository_url}:${jsondecode(data.external.mp_app_tags_of_most_recently_pushed_image.result.tags)[0]}"
-}
-
 variable "container_memory" {
   type        = number
   description = "The amount of memory (in MiB) to allow the container to use. This is a hard limit, if the container attempts to exceed the container_memory, the container is killed. This field is optional for Fargate launch type and the total amount of container_memory of all containers in a task will need to be lower than the task memory value"
