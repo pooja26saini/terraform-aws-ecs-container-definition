@@ -30,15 +30,19 @@ variable "port_mappings" {
 
 # https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_HealthCheck.html
 variable "healthcheck" {
-  type = list(string({
-    command     = ["CMD-SHELL", "test $(ls -l /var/www/public | wc -l) -ge 0 || exit 1"]
+  type = object({
+    command     = list(string)
+    retries     = string
+    timeout     = string
+    interval    = string
+    startPeriod = string
+  })
+  description = "A map containing command (string), timeout, interval (duration in seconds), retries (1-10, number of times to retry before marking container unhealthy), and startPeriod (0-300, optional grace period to wait, in seconds, before failed healthchecks count toward retries)"
+  default     = command     = ["CMD-SHELL", "test $(ls -l /var/www/public | wc -l) -ge 0 || exit 1"]
     retries     = 3
     timeout     = 5
     interval    = 30
     startPeriod = 3
-  }))
-  description = "A map containing command (string), timeout, interval (duration in seconds), retries (1-10, number of times to retry before marking container unhealthy), and startPeriod (0-300, optional grace period to wait, in seconds, before failed healthchecks count toward retries)"
-  default     = null
 }
 
 variable "container_cpu" {
